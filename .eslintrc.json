@@ -1,0 +1,16 @@
+{
+  "parser": "babel-eslint",
+  "extends": [
+    "plugin:jasmine/recommended"
+  ],
+  "rules": {
+    "no-console": ["error", { "allow": ["log", "warn", "error"] }],
+    "no-param-reassign": ["error", { "props": false }]
+  },
+  "plugins": [
+    "jasmine"
+  ],
+  "env": {
+    "jasmine": true
+  }
+}

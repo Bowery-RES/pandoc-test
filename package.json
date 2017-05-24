@@ -1,0 +1,22 @@
+{
+  "name": "pandoc-test",
+  "version": "1.0.0",
+  "description": "Scratch repository for testing node-pandoc",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node jasmine.js"
+  },
+  "keywords": [
+    "pandoc",
+    "docx",
+    "markdown"
+  ],
+  "author": "Justin Knutson",
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^6.24.1",
+    "babel-preset-latest": "^6.24.1",
+    "node-pandoc": "^0.3.0"
+  }
+}
