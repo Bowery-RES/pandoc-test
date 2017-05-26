@@ -1,6 +1,7 @@
 {
   "parser": "babel-eslint",
   "extends": [
+    "airbnb-base",
     "plugin:jasmine/recommended"
   ],
   "rules": {
