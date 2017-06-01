@@ -1,113 +1,86 @@
 import chalk from 'chalk';
-/* eslint-disable no-underscore-dangle */
 
-const literallyTheAlphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-  'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+// Input Data
 
-const parseTableSpace = (arr) => {
-  const exp = { };
-  arr.forEach((item, i) => {
-    exp[literallyTheAlphabet[i]] = item;
-  });
-  return exp;
-};
+import incomeLevelsData from './income-levels.data';
 
-const _taxInfo = {
-  label: 'Real Estate Taxes',
-  val: 56527,
-};
+console.log(chalk.cyan('Income Levels Data'));
+console.log(incomeLevelsData);
 
-const _operatingExpenses = [
-  { label: 'Insurance', val: 5153 },
-  { label: 'Electricity', val: 1374 },
-  { label: 'Fuel', val: 6870 },
+// Table Row Space Definition
+
+const tableRows = incomeLevelsData.map(item => item.borough);
+
+console.log(chalk.cyan('Table Rows'));
+console.log(tableRows);
+
+// Table Column Space Definition
+
+const tableColumns = [
+  'Borough Name',
+  null,
+  '2010 Census',
+  '2017 Estimate',
+  '% Change 2010 - 2017',
+  '2022 Projected',
+  '% Change 2017 - 2022',
 ];
 
-const _sqFt = 10000;
+console.log(chalk.cyan('Table Columns'));
+console.log(tableColumns);
 
-const _units = 10;
 
-const operatingExpensesTableSchema = {
-  service: (taxInfo, operatingExpenses, sqFt, units) => ({
-    get value() {
-      const labels = ['Total', 'Per Square Foot', 'Per Unit'];
+const percentChange = (past, present) => ((present - past) / past);
 
-      // Rows:
-      // [Operating Expense Items]
-      // Total Operating Expenses
-      // Total Expenses Excluding RE Taxes
-
-      const getVals = (val) => {
-        const vals = [];
-
-        vals.push(val);
-        vals.push(val / sqFt);
-        vals.push(val / units);
-
-        return vals;
-      };
-
-      const expenseRows = [];
-
-      operatingExpenses.unshift(taxInfo);
-      operatingExpenses.forEach((expense) => {
-        const { label, val } = expense;
-        const vals = getVals(val);
-        expenseRows.push({ label, vals });
-      });
-
-      const tSum = (cellSpace, index) => {
-        let sum = 0;
-        cellSpace.forEach((iter) => {
-          sum += iter.vals[index];
-        });
-        return sum;
-      };
-
-      const totalExpenseVals = [];
-      const totalExpenseExcTaxVals = [];
-
-      labels.forEach((label, i) => {
-        const total = tSum(expenseRows, i);
-        const tax = expenseRows[0].vals[i];
-
-        totalExpenseVals.push(total);
-        totalExpenseExcTaxVals.push(total - tax);
-      });
-
-      const totalExpenseRow = {
-        label: 'Total Operating Expenses',
-        vals: totalExpenseVals,
-      };
-
-      const totalExpenseExcTaxRow = {
-        label: 'Total Expenses Excluding RE Taxes',
-        vals: totalExpenseExcTaxVals,
-      };
-
-      return {
-        expenseRows,
-        totalExpenseRow,
-        totalExpenseExcTaxRow,
-      };
-    },
-  }),
+const table = {
+  rows: [],
 };
 
-const oeTable = operatingExpensesTableSchema
-  .service(_taxInfo, _operatingExpenses, _sqFt, _units)
-  .value;
+incomeLevelsData.forEach((data) => {
+  const { borough } = data;
 
-console.log(oeTable);
+  const avg = {
+    past: data[2010].avg,
+    present: data[2017].avg,
+    future: data[2022].avg,
+  };
 
-Object.entries(oeTable).forEach((entry) => {
-  const [key, val] = entry;
-  console.log(chalk.cyan(key));
-  if (val instanceof Array) {
-    val.forEach((item) => {
-      console.log(chalk.green(item.label), parseTableSpace(item.vals));
-    });
-  } else {
-    console.log(chalk.green(val.label), parseTableSpace(val.vals));
-  }
+  const avgRow = Object.assign(avg, {
+    presentChange: percentChange(avg.past, avg.present),
+    futureChange: percentChange(avg.present, avg.future),
+  });
+
+  const med = {
+    past: data[2010].med,
+    present: data[2017].med,
+    future: data[2022].med,
+  };
+
+  const medRow = Object.assign(med, {
+    presentChange: percentChange(med.past, med.present),
+    futureChange: percentChange(med.present, med.future),
+  });
+
+  const boroughRows = [
+    { label: 'Average', columns: avgRow },
+    { label: 'Median', columns: medRow },
+  ];
+
+  table.rows.push({
+    label: borough,
+    rows: boroughRows,
+  });
 });
+
+console.log(chalk.cyan('Table Object'));
+console.log(table);
+
+console.log(chalk.cyan('Size of Row Space'));
+
+let space = 0;
+
+table.rows.forEach((tr) => {
+  space += tr.rows.length;
+});
+
+console.log(space);
